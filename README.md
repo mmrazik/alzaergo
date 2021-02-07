@@ -21,7 +21,7 @@ The control box has a RJ-45 port. It seems like all 8 pins are being used but th
 
 
 The wiring of the RJ45 port is as follows:
-<img style="float: right;" src="images/rj45.png">
+<img align="right" src="images/rj45.png">
 1. D-TX (green wire)
 2. D-RX (brown wire)
 3. unused
