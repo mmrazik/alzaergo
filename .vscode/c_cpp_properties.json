@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/mmrazik/arduino-1.8.12/tools/**",
+                "/home/mmrazik/Arduino/libraries/**",
+                "/home/mmrazik/arduino-1.8.12/libraries/**",
+                "/home/mmrazik/arduino-1.8.12/hardware/tools/**",
+                "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/**"
+            ],
+            "forcedInclude": [
+                "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h"
+            ],
+            "defines": [
+                "USBCON"
+            ],
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}
