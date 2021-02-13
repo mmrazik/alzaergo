@@ -1,0 +1,160 @@
+
+
+Board:
+5A 7D .. 3F 10 ..
+
+
+62cm: DB .. .. A7
+65cm: ED .. .. B9
+
+
+s: CF .. .. 9B
+l: CF .. .. 9B
+
+----------------
+62cm to 63 cm
+6th - 4th = 0x68
+
+5A 7D DB 6 10 6E     (62.x cm)
+..
+5A 7D DB 5B 10 C3
+..
+5A 7D DB 4F 10 B7
+..
+5A 7D DB 66 10 CE
+..
+5A 7D DB 6D 10 D5
+..
+5A 7D DB 7D 10 E5
+..
+5A 7D DB 7F 10 E7
+..
+5A 7D DB 6F 10 D7
+..
+5A 7D CF 3F 10 9B (many times; 63.0)
+-------------------
+
+-----------------
+63 to 87cm
+5A 7D CF 6 10 62    (63.x cm)
+5A 7D CF 5B 10 B7
+5A 7D CF 4F 10 AB
+5A 7D CF 66 10 C2
+5A 7D CF 6D 10 C9
+5A 7D CF 7D 10 D9
+5A 7D CF 7 10 63
+5A 7D CF 7F 10 DB
+5A 7D CF 7F 10 10 81
+5A 7D ED 7 10 81 (many times/; probably at 64.x cm)
+57 D5 F5 6D 10 (many times)
+... probably noise
+5A 7D FF 3F 10 CB
+5A 7D FF 6 10 92
+
+5A 7D FF 5B 10 E7
+5A 7D FF 4F 10 DB
+5A 7D FF 66 10 52
+D5 FD 66 10 52
+D5 FD 6D 10 49
+D5 FD 6D 10 49
+D5 FD 7D 10 9
+
+5A 7D FF 7D 10 9
+5A 7D FF 7 10 93
+
+5A 7D FF 7F 10 B
+5A 7D FF 6F 10 4B
+D5 FD 6F 10 4B
+
+
+
+end:
+
+5A 7F DB 66 10 D0
+
+5A 7F DB 6D 10 D7
+
+5A 7F DB 7D 10 E7
+
+5A 7F 87 6 10 1C (87.1cm)
+
+--------------------
+
+87.1cm to 90.xcm
+5A 7F FF 7D 10 B
+5A 7F EF 7 10 85
+5A 7F EF 6F 10 ED
+
+5A 6F BF 3F 10 7D  (?90.0)
+5A 6F BF 6 10 44   (?90.1)
+5A 6F BF 5B 10 99  (90.2cm)
+
+
+
+---------
+90.2 to 128
+stops at 100, 111, 128cm
+
+5A 6 6 7D 10 99
+5A 6 5B 6 10 77
+5A 6 5B 5B 10 CC
+5A 6 5B 4F 10 C0 (128 cm)
+
+
+7D -> 7 -> 7F -> 6F -> 6
+
+DB -> CF  -> E6 -> ED -> FD ->
+
+
+----------------------------
+5A 7D DB 3F 10 A7   62.0 cm
+5A 7D CF 3F 10 9B   63.0 cm
+5A 7D E6 3F 10 B2   64.0 cm
+5A 7D ED 3F 10 B9   65.0 cm
+5A 7D FD 3F 10 C9   66.0 cm
+5A 7D 87 3F 10 53   67.0 cm
+5A 7D FF 3F 10 CB   68.0 cm
+5A 7D EF 3F 10 BB   69.0 cm
+5A 07 BF 3F 10 15   70.0 cm
+5A 07 86 3F 10 DC   71.0 cm
+5A 07 DB 3F 10 31   72.0 cm
+5A 07 CF 3F 10 25   73.0 cm
+5A 07 E6 3F 10 3C   74.0 cm
+5A 07 E6 5B 10 58   74.2 cm
+5A 07 E6 6D 10 6A   74.5 cm
+5A 07 E6 6F 10 6C   74.9 cm
+5A 07 ED 3F 10 43   75.0 cm
+5A 07 ED 4F 10 53   75.3 cm
+5A 07 ED 6D 10 71   75.5 cm
+5A 07 ED 6F 10 73   75.9 cm
+5A 07 FD 3F 10 53   76.0 cm
+5A 07 FD 06 10 1A   76.1 cm
+5A 07 FD 5B 10 6F   76.2 cm
+5A 07 FD 4F 10 63   76.3 cm
+5A 07 FD 66 10 7A   76.4 cm
+5A 07 FD 6D 10 81   76.5 cm
+5A 07 FD 7D 10 91   76.6 cm
+5A 07 FD 07 10 1B   76.7 cm
+5A 07 FD 7F 10 93   76.8 cm
+5A 07 FD 6F 10 83   76.9 cm
+5A 07 87 3F 10 DD   77.0 cm
+5A 07 EF 6F 10 75   79.9 cm     5A 07 EF 6F 10 .. 79.9 cm
+5A 7F BF 3F 10 8D   80.0 cm
+5A 7F DB 3F 10 A9   82.0 cm
+5A 6F BF 3F 10 7D   90.0 cm
+5A 6F EF 6F 10 DD   99.9 cm
+5A 06 3F 3F 10 94   100 cm
+5A 06 3F 5B 10 B0   102 cm
+5A 06 06 3F 10 5B   110 cm
+5A 06 5B 3F 10 B0   120 cm
+
+ _
+|_|
+|_|
+
+
+
+
+0b01000100
+0b01010011
+0b00010111
