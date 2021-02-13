@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "alzaergo.ino",
+    "sketch": "monitor.ino",
     "programmer": "AVR ISP",
     "port": "/dev/ttyACM0"
 }

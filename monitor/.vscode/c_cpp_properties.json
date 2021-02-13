@@ -3,15 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "/home/mmrazik/arduino-1.8.13/tools/**",
+                "/home/mmrazik/arduino-1.8.12/tools/**",
                 "/home/mmrazik/Arduino/libraries/**",
-                "/home/mmrazik/arduino-1.8.13/libraries/**",
-                "/home/mmrazik/arduino-1.8.13/hardware/tools/**",
-                "/home/mmrazik/arduino-1.8.13/hardware/arduino/avr/**",
-                "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/**",
-                "/home/mmrazik/arduino-1.8.12/hardware/tools/**",
                 "/home/mmrazik/arduino-1.8.12/libraries/**",
-                "/home/mmrazik/arduino-1.8.12/tools/**"
+                "/home/mmrazik/arduino-1.8.12/hardware/tools/**",
+                "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/**"
             ],
             "forcedInclude": [
                 "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h"
