@@ -29,38 +29,19 @@
 #include <NeoSWSerial.h>
 
 NeoSWSerial pin10(10, 8); // RX, TX
-NeoSWSerial pin11(12, 9); // RX, TX
-//SoftwareSerial pin12(12, 7); // RX, TX
-#define BUFFER_SIZE 512
-int pin10_counter = 0;
-int buffer[BUFFER_SIZE+10];
-int buffer_counter = 0;
-int pin11_counter = 0;
-int pin12_counter = 0;
+#define KEY_PIN 13
+
 
 static void handlePin10Rx( uint8_t c )
 {
-    //Serial.print("p:");
-    //Serial.print(c, HEX);
-    if (buffer_counter >= BUFFER_SIZE) return;
-    //buffer[buffer_counter] = 10;
-    buffer[buffer_counter] = c;
-    buffer_counter = buffer_counter + 1;
-}
-
-static void handlePin11Rx( uint8_t c )
-{
-    //Serial.print("b:");
-    //Serial.print(c, HEX);
-    //buffer[buffer_counter] = 11;
-    if (buffer_counter >= BUFFER_SIZE) return;
-    buffer[buffer_counter] = c;
-    buffer_counter = buffer_counter + 1;
+    Serial.print(c, HEX);
+    Serial.print(" ");
 }
 
 void setup()
 {
-  pinMode(13, OUTPUT);
+  pinMode(KEY_PIN, OUTPUT);
+  digitalWrite(KEY_PIN, LOW);
 
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
@@ -71,58 +52,68 @@ void setup()
 
 
   Serial.println("Goodnight moon2!");
-  buffer[0] = 0;
 
 
   pin10.attachInterrupt(handlePin10Rx);
   pin10.begin(9600);
-
-  //pin11.attachInterrupt(handlePin11Rx);
-  //pin11.begin(9600);
-
-  // set the data rate for the SoftwareSerial port
-  //pin10.begin(9600);
-  //pin11.begin(9600);
-  //pin12.begin(9600);
-  //mySerial.println("Hello, world?");
 }
-int incomingByte = 0;
-/*
 
-void printFormattedSerial(SoftwareSerial *pin, int counter) {
-    //Serial.print("pin10: ");
-    incomingByte = pin->read();
-    Serial.print(counter);
-    Serial.print(":");
-    if (incomingByte < 16) {
-      Serial.print("0");
-    }
-    Serial.println(incomingByte, HEX);
-}
-*/
 
+int in = 0;
+#define UP 0x77 //W
+#define DOWN 0x73 //S
+#define ENTER 0xd
+#define SPACE 0x20
+#define BUTTON_DURATION 600
+#define DELAY_BETWEEN_WRITES 7
+int direction = 0;
+unsigned long action_start;
+unsigned long last_write;
 
 
 void loop() // run over and over
 {
-  if (buffer_counter >= BUFFER_SIZE) {
-    for (int i = 0; i< buffer_counter; i++) {
-      Serial.print(buffer[i], HEX);
-      Serial.print(" ");
+
+  if ((direction == UP) && ((millis() - last_write) >= DELAY_BETWEEN_WRITES)) {
+    pin10.write("\xa5\x00\x20\x01\x21");
+    last_write = millis();
+  }
+
+  if ((millis() - action_start) >= BUTTON_DURATION) {
+    direction = 0;
+    digitalWrite(KEY_PIN, LOW);
+  }
+
+  if (Serial.available()) {
+    in = Serial.read();
+    Serial.println(in, HEX);
+
+    if (in == SPACE) {
+       Serial.println("status");
+      // A5 0 0 1 1
+       pin10.write("\xa5\x00\x00\x01\x01");
+       in = 0;
     }
-    buffer_counter = 0;
+
+    if (in == UP) {
+      Serial.println("up");
+      direction = UP;
+      action_start = millis();
+      digitalWrite(KEY_PIN, HIGH);
+      // A5 0 20 1 21  Move up
+      pin10.write("\xa5\x00\x20\x01\x21");
+      last_write = millis();
+    }
+
+    if (in == DOWN) {
+      Serial.println("down");
+      pin10.write("\xa5\x00\x40\x01\x41");
+      pin10.write(0xA5);
+      pin10.write((uint8_t) 0x0);
+      pin10.write(0x40);
+      pin10.write(0x1);
+      pin10.write(0x41);
+      in = 0;
+    }
   }
-
-    //Serial.print('a');
-/*
-  if (pin10.available()) {
-    printFormattedSerial(&pin10, 10);
-  }
-
-
-  if (pin11.available()) {
-    printFormattedSerial(&pin11, 11);
-  }
-*/
-
 }
