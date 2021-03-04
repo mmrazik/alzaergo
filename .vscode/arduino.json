@@ -2,5 +2,5 @@
     "board": "arduino:avr:uno",
     "sketch": "alzaergo.ino",
     "programmer": "AVR ISP",
-    "port": "/dev/ttyACM0"
+    "port": "/dev/ttyACM1"
 }
