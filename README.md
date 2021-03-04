@@ -51,6 +51,13 @@ Few random observations
 A5 0 0 1 1    Idle
 A5 0 20 1 21  Move up
 A5 0 40 1 41  Move down
+
+
+A5 0 1 1 2    M button
+A5 0 2 1 3    memory 1
+A5 0 4 1 5    memory 2
+A5 0 8 1 9    memory 3
+A5 0 10 1 11  T button
 ```
 ### Board messages
 #### Table height
@@ -95,3 +102,4 @@ The full list of digits:
 | 9     | `0x6f` or `0xef`   | `0b01101111` or `0b11101111` |
 
 The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height `76.5` cm (byte `07` corresponds to `7`, byte `FD` corresponds to `6` and byte `6d` corresponds to `5`).
+
