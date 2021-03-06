@@ -11,10 +11,16 @@
                 "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/**",
                 "/home/mmrazik/arduino-1.8.12/hardware/tools/**",
                 "/home/mmrazik/arduino-1.8.12/libraries/**",
-                "/home/mmrazik/arduino-1.8.12/tools/**"
+                "/home/mmrazik/arduino-1.8.12/tools/**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\tools\\**"
             ],
             "forcedInclude": [
-                "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h"
+                "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ],
             "defines": [
                 "USBCON"
@@ -23,6 +29,22 @@
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++14"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Program Files (x86)\\Arduino\\tools\\**",
+                "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**"
+            ],
+            "forcedInclude": [
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ],
+            "defines": [
+                "USBCON"
+            ]
         }
     ],
     "version": 4
