@@ -1,119 +1,73 @@
-/*
-  Software serial multple serial test
-
- Receives from the hardware serial, sends to software serial.
- Receives from software serial, sends to hardware serial.
-
- The circuit:
- * RX is digital pin 2 (connect to TX of other device)
- * TX is digital pin 3 (connect to RX of other device)
-
- Note:
- Not all pins on the Mega and Mega 2560 support change interrupts,
- so only the following can be used for RX:
- 10, 11, 12, 13, 50, 51, 52, 53, 62, 63, 64, 65, 66, 67, 68, 69
-
- Not all pins on the Leonardo support change interrupts,
- so only the following can be used for RX:
- 8, 9, 10, 11, 14 (MISO), 15 (SCK), 16 (MOSI).
-
- created back in the mists of time
- modified 25 May 2012
- by Tom Igoe
- based on Mikal Hart's example
-
- This example code is in the public domain.
-
- */
-//#include <SoftwareSerial.h>
 #include <NeoSWSerial.h>
+#include <Wire.h>
+#include <U8g2lib.h>
 
-NeoSWSerial pin10(10, 8); // RX, TX
-#define KEY_PIN 13
+#include "AlzaET1Ng.h"
 
 
-static void handlePin10Rx( uint8_t c )
-{
-    Serial.print(c, HEX);
-    Serial.print(" ");
-}
+#define KEY_PIN 30
+const int key_pins[] = {47, 49, 51, 53};
+#define KEY_UP 0
+#define KEY_DOWN 1
+#define KEY_M 2
+
+AlzaET1Ng::ControlPanel AlzaControl(&Serial1, KEY_PIN);
+
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
 void setup()
 {
-  pinMode(KEY_PIN, OUTPUT);
-  digitalWrite(KEY_PIN, LOW);
+    Serial.begin(9600);
+    Serial.write("Hello world");
+    for(int x=0; x<4; x++)
+    {
+      pinMode(key_pins[x], INPUT);
+    }
 
-  // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for Native USB only
-  }
-
-
-  Serial.println("Goodnight moon2!");
+    u8g2.begin();
 
 
-  pin10.attachInterrupt(handlePin10Rx);
-  pin10.begin(9600);
+    u8g2.clearBuffer();
+
+    u8g2.setFontMode(1);
+    u8g2.setFont(u8g2_font_cu12_tr);
+
+    u8g2.setCursor(0,15);
+    u8g2.print(F("Hello world"));
+    u8g2.sendBuffer();
+
 }
 
+void writeln(String ln) {
+    u8g2.clearBuffer();
+    u8g2.setCursor(0,15);
+    u8g2.print(ln);
+    u8g2.sendBuffer();
+}
 
-int in = 0;
-#define UP 0x77 //W
-#define DOWN 0x73 //S
-#define ENTER 0xd
-#define SPACE 0x20
-#define BUTTON_DURATION 600
-#define DELAY_BETWEEN_WRITES 7
-int direction = 0;
-unsigned long action_start;
-unsigned long last_write;
+int up, down, memory;
+int last_refresh = 0;
 
-
-void loop() // run over and over
+void loop()
 {
+    AlzaControl.handleLoop();
 
-  if ((direction == UP) && ((millis() - last_write) >= DELAY_BETWEEN_WRITES)) {
-    pin10.write("\xa5\x00\x20\x01\x21");
-    last_write = millis();
-  }
+    up = digitalRead(key_pins[KEY_UP]);
+    down = digitalRead(key_pins[KEY_DOWN]);
+    memory = digitalRead(key_pins[KEY_M]);
 
-  if ((millis() - action_start) >= BUTTON_DURATION) {
-    direction = 0;
-    digitalWrite(KEY_PIN, LOW);
-  }
-
-  if (Serial.available()) {
-    in = Serial.read();
-    Serial.println(in, HEX);
-
-    if (in == SPACE) {
-       Serial.println("status");
-      // A5 0 0 1 1
-       pin10.write("\xa5\x00\x00\x01\x01");
-       in = 0;
+    if (up == HIGH) {
+        AlzaControl.holdCommand(AlzaET1Ng::Commands::Up);
+    } else if (down == HIGH) {
+        AlzaControl.holdCommand(AlzaET1Ng::Commands::Down);
+    } else if (memory == HIGH) {
+        AlzaControl.holdCommand(AlzaET1Ng::Commands::M);
+    } else {
+        AlzaControl.holdCommand(AlzaET1Ng::Commands::Status);
     }
 
-    if (in == UP) {
-      Serial.println("up");
-      direction = UP;
-      action_start = millis();
-      digitalWrite(KEY_PIN, HIGH);
-      // A5 0 20 1 21  Move up
-      pin10.write("\xa5\x00\x20\x01\x21");
-      last_write = millis();
+    if (millis() - last_refresh > 250) {
+        writeln(AlzaControl.getBcdDisplayAsString());
+        last_refresh = millis();
     }
-
-    if (in == DOWN) {
-      Serial.println("down");
-      pin10.write("\xa5\x00\x40\x01\x41");
-      pin10.write(0xA5);
-      pin10.write((uint8_t) 0x0);
-      pin10.write(0x40);
-      pin10.write(0x1);
-      pin10.write(0x41);
-      in = 0;
-    }
-  }
 }

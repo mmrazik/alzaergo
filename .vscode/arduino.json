@@ -1,6 +1,7 @@
 {
-    "board": "arduino:avr:uno",
+    "board": "arduino:avr:mega",
     "sketch": "alzaergo.ino",
     "programmer": "AVR ISP",
-    "port": "/dev/ttyACM1"
+    "port": "COM8",
+    "configuration": "cpu=atmega2560"
 }
