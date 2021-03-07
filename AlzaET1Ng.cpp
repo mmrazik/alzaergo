@@ -29,11 +29,17 @@ const char AlzaET1Ng::bcdDigitToString(int bcd_code)
     case 0x6f:
         return '9';
     case 0x40:
-      return '-';
+        return '-';
     case 0x79:
-      return 'E';
+        return 'E';
+    case 0x50:
+        return 'r';
+    case 0x64:
+        return 'r';
+    case 0x78:
+        return 't';
   }
-  return ' ';
+  return '?';
 }
 
 ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
@@ -43,18 +49,15 @@ ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
 
     serial = hws;
     serial->begin(9600);
-    while (!*serial) {
-        ; // wait for serial port to connect. Needed for Native USB only
-    }
     nextCommand = Commands::Status;
 }
 
 bool ControlPanel::isValidResponse(int response[]) {
     unsigned int checksum = 0;
-    for (int i=1; i < RESPONSE_SIZE - 1; i++) {
+    for (int i=2; i < RESPONSE_SIZE; i++) {
         checksum = (checksum + response[i]) & 0xff;
     }
-    return checksum == response[RESPONSE_SIZE - 1];
+    return checksum == response[RESPONSE_SIZE];
 }
 
 void ControlPanel::sendCommand(Commands cmd) {
@@ -68,6 +71,40 @@ void ControlPanel::sendCommand(Commands cmd) {
     waitForResponse = true;
 }
 
+int ControlPanel::bcdToMetricHeight() {
+    // height in mm
+    // TODO: this works only with centimeters. If the control board is configured to inches this
+    // will be returning garbage
+    int new_height = 0;
+    for (int i = 0; i < 3; i++) {
+        if (!(displayStatusString[i] >= '0' && displayStatusString[i] <= '9')) {
+            return 0;
+        }
+        new_height = (displayStatusString[i] - '0') *10 + new_height;
+    }
+    //if the result is e.g. 123, it means we are above one meter and we multiply by 10
+    if (new_height < 200) {
+        new_height = new_height * 10;
+    }
+    return new_height;
+}
+
+void ControlPanel::updateRepresentations() {
+    // raw (7 segment display)
+    displayStatus[0] = responseBuffer[2];
+    displayStatus[1] = responseBuffer[3];
+    displayStatus[2] = responseBuffer[4];
+
+    // 7 segment display to ASCII
+    displayStatusString[0] = bcdDigitToString(displayStatus[0]);
+    displayStatusString[1] = bcdDigitToString(displayStatus[1]);
+    displayStatusString[2] = bcdDigitToString(displayStatus[2]);
+
+    int new_height = bcdToMetricHeight();
+    if (new_height != 0) {
+        height = new_height;
+    }
+}
 
 void ControlPanel::handleIncomingResponse() {
     if (serial->available()) {
@@ -83,9 +120,7 @@ void ControlPanel::handleIncomingResponse() {
         if (responseBuffer[0] == RESPONSE_SIZE) {
             waitForResponse = false;
             if (isValidResponse(responseBuffer)) {
-                displayStatus[0] = responseBuffer[2];
-                displayStatus[1] = responseBuffer[3];
-                displayStatus[2] = responseBuffer[4];
+                updateRepresentations();
             } // else invalid response -- nothing we can do here; ignore and let the controller send the nextCommand
         }
     }
@@ -104,21 +139,22 @@ void ControlPanel::handleLoop() {
 
 
 void ControlPanel::holdCommand(Commands cmd) {
-    nextCommand = cmd;
     if (cmd == Commands::Status) {
         digitalWrite(keyPin, LOW);
     } else {
         digitalWrite(keyPin, HIGH);
     }
+    nextCommand = cmd;
 }
 
 const int *const ControlPanel::getBcdDisplay() {
     return displayStatus;
 }
 
-const char *ControlPanel::getBcdDisplayAsString() {
-    displayStatusString[0] = bcdDigitToString(displayStatus[0]);
-    displayStatusString[1] = bcdDigitToString(displayStatus[1]);
-    displayStatusString[2] = bcdDigitToString(displayStatus[2]);
+const char *const ControlPanel::getBcdDisplayAsString() {
     return displayStatusString;
+}
+
+int ControlPanel::getHeightInMm() {
+    return height;
 }

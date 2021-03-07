@@ -51,6 +51,7 @@ Few random observations
 A5 0 0 1 1    Idle
 A5 0 20 1 21  Move up
 A5 0 40 1 41  Move down
+A5 0 60 1 61  UP and Down
 
 
 A5 0 1 1 2    M button
