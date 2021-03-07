@@ -68,9 +68,15 @@ void ControlPanel::sendCommand(Commands cmd) {
     if (waitForResponse) {
         return;
     }
-    for (int i=0; i < COMMAND_SIZE; i++) {
-      serial->write((uint8_t) commands[(int)cmd][i]);
-    }
+    // Command is 5 bytes:
+    // [command_header] 0x0 [command] 0x01 [checksum]
+    // e.g. 0xa5, 0x00, 0x20, 0x01, 0x21
+    serial->write((uint8_t) COMMAND_HEADER);
+    serial->write((uint8_t) 0x0);
+    serial->write((uint8_t) cmd);
+    serial->write((uint8_t) 0x01);
+    serial->write((uint8_t) cmd + 1);
+
     lastCommandExecution = millis();
     waitForResponse = true;
 }
@@ -140,6 +146,7 @@ void ControlPanel::handleIncomingResponse() {
 void ControlPanel::handleLoop() {
     sendCommand(nextCommand);
     handleIncomingResponse();
+    evaluateTargetHeight();
 
 
     // if we are in some weird state, still waiting for a response but nothing comes in, stop waiting for response
@@ -190,4 +197,25 @@ int ControlPanel::getHeightInMm() {
     #ifdef ALZAET1NG_THREADSAFE
     taskEXIT_CRITICAL();
     #endif
+}
+
+void ControlPanel::evaluateTargetHeight() {
+    if (targetHeight != 0) {
+        if ((nextCommand == Commands::Up) && (height >= targetHeight)) {
+            holdCommand(Commands::Status);
+        } else
+        if ((nextCommand == Commands::Down) && (height <= targetHeight)) {
+            holdCommand(Commands::Status);
+        }
+    }
+}
+
+void ControlPanel::setHeight(int newHeight) {
+    targetHeight = newHeight;
+    if (newHeight > height) {
+        holdCommand(Commands::Up);
+    } else
+    if (newHeight < height) {
+        holdCommand(Commands::Down);
+    }
 }
