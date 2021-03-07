@@ -51,7 +51,7 @@ Few random observations
 A5 0 0 1 1    Idle
 A5 0 20 1 21  Move up
 A5 0 40 1 41  Move down
-A5 0 60 1 61  UP and Down
+A5 0 60 1 61  UP and Down (used to reset)
 
 
 A5 0 1 1 2    M button
@@ -103,4 +103,3 @@ The full list of digits:
 | 9     | `0x6f` or `0xef`   | `0b01101111` or `0b11101111` |
 
 The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height `76.5` cm (byte `07` corresponds to `7`, byte `FD` corresponds to `6` and byte `6d` corresponds to `5`).
-
