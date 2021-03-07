@@ -2,6 +2,10 @@
 #include "Arduino.h"
 using namespace AlzaET1Ng;
 
+#ifdef ALZAET1NG_THREADSAFE
+    #include "task.h"
+#endif
+
 
 
 const char AlzaET1Ng::bcdDigitToString(int bcd_code)
@@ -90,6 +94,10 @@ int ControlPanel::bcdToMetricHeight() {
 }
 
 void ControlPanel::updateRepresentations() {
+    #ifdef ALZAET1NG_THREADSAFE
+    taskENTER_CRITICAL();
+    #endif
+
     // raw (7 segment display)
     displayStatus[0] = responseBuffer[2];
     displayStatus[1] = responseBuffer[3];
@@ -104,6 +112,9 @@ void ControlPanel::updateRepresentations() {
     if (new_height != 0) {
         height = new_height;
     }
+    #ifdef ALZAET1NG_THREADSAFE
+    taskEXIT_CRITICAL();
+    #endif
 }
 
 void ControlPanel::handleIncomingResponse() {
@@ -147,14 +158,36 @@ void ControlPanel::holdCommand(Commands cmd) {
     nextCommand = cmd;
 }
 
-const int *const ControlPanel::getBcdDisplay() {
-    return displayStatus;
+void ControlPanel::getBcdDisplay(int *data) {
+    #ifdef ALZAET1NG_THREADSAFE
+    taskENTER_CRITICAL();
+    #endif
+    data[0] = displayStatus[0];
+    data[1] = displayStatus[1];
+    data[2] = displayStatus[2];
+    #ifdef ALZAET1NG_THREADSAFE
+    taskEXIT_CRITICAL();
+    #endif
 }
 
-const char *const ControlPanel::getBcdDisplayAsString() {
-    return displayStatusString;
+void ControlPanel::getBcdDisplayAsString(char *data) {
+    #ifdef ALZAET1NG_THREADSAFE
+    taskENTER_CRITICAL();
+    #endif
+    data[0] = displayStatusString[0];
+    data[1] = displayStatusString[1];
+    data[2] = displayStatusString[2];
+    #ifdef ALZAET1NG_THREADSAFE
+    taskEXIT_CRITICAL();
+    #endif
 }
 
 int ControlPanel::getHeightInMm() {
+    #ifdef ALZAET1NG_THREADSAFE
+    taskENTER_CRITICAL();
+    #endif
     return height;
+    #ifdef ALZAET1NG_THREADSAFE
+    taskEXIT_CRITICAL();
+    #endif
 }
