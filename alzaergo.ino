@@ -66,8 +66,11 @@ void loop()
         AlzaControl.holdCommand(AlzaET1Ng::Commands::Status);
     }
 
+
     if (millis() - last_refresh > 250) {
-        writeln(AlzaControl.getBcdDisplayAsString());
+        //writeln(AlzaControl.getBcdDisplayAsString());
+        Serial.write(AlzaControl.getBcdDisplayAsString());
+        Serial.write("\r\n");
         last_refresh = millis();
     }
 }

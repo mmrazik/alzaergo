@@ -20,7 +20,8 @@ namespace AlzaET1Ng
         M1 = 4,
         M2 = 5,
         M3 = 6,
-        T = 7
+        T = 7,
+        Reset = 8
     };
 
     class ControlPanel
@@ -28,15 +29,18 @@ namespace AlzaET1Ng
     private:
         int displayStatus[3] = {0, 0, 0};
         char displayStatusString[4] = {0, 0, 0, 0};
+        int height;
         HardwareSerial *serial;
         bool isValidResponse(int response[]);
         void handleIncomingResponse();
+        void updateRepresentations();
+        int bcdToMetricHeight();
         Commands nextCommand;
         bool waitForResponse = false;
         unsigned long lastCommandExecution = 0;
         int responseBuffer[RESPONSE_SIZE + 1] = {0, 0, 0, 0, 0, 0, 0};
         int keyPin;
-        const int commands[8][5] = {
+        const int commands[9][5] = {
             {0xa5, 0x00, 0x00, 0x01, 0x01},
             {0xa5, 0x00, 0x20, 0x01, 0x21},
             {0xa5, 0x00, 0x40, 0x01, 0x41},
@@ -44,7 +48,8 @@ namespace AlzaET1Ng
             {0xa5, 0x00, 0x02, 0x01, 0x03},
             {0xa5, 0x00, 0x04, 0x01, 0x05},
             {0xa5, 0x00, 0x08, 0x01, 0x09},
-            {0xa5, 0x00, 0x10, 0x01, 0x11}
+            {0xa5, 0x00, 0x10, 0x01, 0x11},
+            {0xa5, 0x00, 0x60, 0x01, 0x61}
         };
 
     public:
@@ -54,9 +59,8 @@ namespace AlzaET1Ng
         void handleLoop();
         void holdCommand(Commands cmd);
         const int *const getBcdDisplay();
-        const char *getBcdDisplayAsString();
-
-
+        const char *const getBcdDisplayAsString();
+        int getHeightInMm();
     };
 };
 #endif
