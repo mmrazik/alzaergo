@@ -2,6 +2,8 @@
 #define AlzaET1Ng_h
 #include "Arduino.h"
 
+#ifdef ALZAET1NG_THREADSAFE
+#endif
 
 
 
@@ -24,22 +26,22 @@ namespace AlzaET1Ng
         Reset = 8
     };
 
+
     class ControlPanel
     {
     private:
         int displayStatus[3] = {0, 0, 0};
         char displayStatusString[4] = {0, 0, 0, 0};
         int height;
+
         HardwareSerial *serial;
-        bool isValidResponse(int response[]);
-        void handleIncomingResponse();
-        void updateRepresentations();
-        int bcdToMetricHeight();
+        int keyPin;
+
         Commands nextCommand;
         bool waitForResponse = false;
         unsigned long lastCommandExecution = 0;
         int responseBuffer[RESPONSE_SIZE + 1] = {0, 0, 0, 0, 0, 0, 0};
-        int keyPin;
+
         const int commands[9][5] = {
             {0xa5, 0x00, 0x00, 0x01, 0x01},
             {0xa5, 0x00, 0x20, 0x01, 0x21},
@@ -51,6 +53,10 @@ namespace AlzaET1Ng
             {0xa5, 0x00, 0x10, 0x01, 0x11},
             {0xa5, 0x00, 0x60, 0x01, 0x61}
         };
+        bool isValidResponse(int response[]);
+        void handleIncomingResponse();
+        void updateRepresentations();
+        int bcdToMetricHeight();
 
     public:
         // TODO: Add a constructor for NeoSWSerial/SoftwareSerial so this can be used with SW serial too
@@ -58,8 +64,8 @@ namespace AlzaET1Ng
         void sendCommand(Commands cmd);
         void handleLoop();
         void holdCommand(Commands cmd);
-        const int *const getBcdDisplay();
-        const char *const getBcdDisplayAsString();
+        void getBcdDisplay(int *data);
+        void getBcdDisplayAsString(char *data);
         int getHeightInMm();
     };
 };

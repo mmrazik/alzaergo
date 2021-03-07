@@ -47,6 +47,7 @@ void writeln(String ln) {
 
 int up, down, memory;
 int last_refresh = 0;
+char displayData[] = {0, 0, 0, 0};
 
 void loop()
 {
@@ -69,7 +70,8 @@ void loop()
 
     if (millis() - last_refresh > 250) {
         //writeln(AlzaControl.getBcdDisplayAsString());
-        Serial.write(AlzaControl.getBcdDisplayAsString());
+        AlzaControl.getBcdDisplayAsString(displayData);
+        Serial.write(displayData);
         Serial.write("\r\n");
         last_refresh = millis();
     }
