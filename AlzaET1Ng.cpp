@@ -38,10 +38,12 @@ const char AlzaET1Ng::bcdDigitToString(int bcd_code)
         return 'E';
     case 0x50:
         return 'r';
-    case 0x64:
-        return 'r';
-    case 0x78:
-        return 't';
+    case 0x6c:
+        return 'S';
+    case 0x30:
+        return 'T';
+    case 0x00:
+        return ' ';
   }
   return '?';
 }

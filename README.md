@@ -59,6 +59,7 @@ A5 0 2 1 3    memory 1
 A5 0 4 1 5    memory 2
 A5 0 8 1 9    memory 3
 A5 0 10 1 11  T button
+A5 0 11 1 12  M+T (to get into settings)
 ```
 ### Board messages
 #### Table height
@@ -87,6 +88,9 @@ For example 6 can be represented as 0b01111101 (or 0b11111101)
   |____|
      3
 ```
+
+The top most bit of the middle byte is signaling the decimal point.
+`0x06 0xbf 0x06` translates to `10.1` on display while `0x06 0x3f 0x06` translates to `101` on the display.
 
 The full list of digits:
 | Digit | Hex                | binary                       |
