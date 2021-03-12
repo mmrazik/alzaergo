@@ -1,7 +1,7 @@
 {
-    "board": "arduino:avr:mega",
+    "board": "espressif:esp32:esp32s2",
     "sketch": "alzaergo.ino",
     "programmer": "AVR ISP",
     "port": "COM8",
-    "configuration": "cpu=atmega2560"
+    "configuration": "SerialMode=default,PSRAM=disabled,PartitionScheme=default,CPUFreq=240,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,DebugLevel=none"
 }

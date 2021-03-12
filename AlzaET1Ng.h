@@ -33,12 +33,12 @@ namespace AlzaET1Ng
         int displayStatus[3] = {0, 0, 0};
         char displayStatusString[4] = {0, 0, 0, 0};
         int height = 0;
-        int targetHeight = 0;
 
         HardwareSerial *serial;
         int keyPin;
 
         Commands nextCommand;
+        int targetHeight = 0;
         bool waitForResponse = false;
         unsigned long lastCommandExecution = 0;
         int responseBuffer[RESPONSE_SIZE + 1] = {0, 0, 0, 0, 0, 0, 0};
