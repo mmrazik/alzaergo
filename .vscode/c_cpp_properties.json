@@ -33,15 +33,14 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\hardware\\espressif\\esp32\\**",
                 "C:\\Program Files (x86)\\Arduino\\tools\\**",
                 "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\libraries\\**",
                 "C:\\Program Files (x86)\\Arduino\\libraries\\**",
                 "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
                 "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**"
             ],
-            "forcedInclude": [
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
-            ],
+            "forcedInclude": [],
             "defines": [
                 "USBCON"
             ]

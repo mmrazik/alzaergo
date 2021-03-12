@@ -38,10 +38,14 @@ const char AlzaET1Ng::bcdDigitToString(int bcd_code)
         return 'E';
     case 0x50:
         return 'r';
-    case 0x6c:
-        return 'S';
-    case 0x30:
+    case 0x31:
         return 'T';
+    case 0x76:
+        return 'H';
+    case 0x5c:
+        return 'o';
+    case 0x78:
+        return 't';
     case 0x00:
         return ' ';
   }
@@ -80,6 +84,14 @@ void ControlPanel::sendCommand(Commands cmd) {
     serial->write((uint8_t) cmd + 1);
 
     lastCommandExecution = millis();
+
+    Serial.print((uint8_t) COMMAND_HEADER, HEX);
+    Serial.print((uint8_t) 0x0, HEX);
+    Serial.print((uint8_t) cmd, HEX);
+    Serial.print((uint8_t) 0x01, HEX);
+    Serial.print((uint8_t) cmd + 1, HEX);
+    Serial.write("\r\n");
+
     waitForResponse = true;
 }
 
@@ -140,6 +152,13 @@ void ControlPanel::handleIncomingResponse() {
             waitForResponse = false;
             if (isValidResponse(responseBuffer)) {
                 updateRepresentations();
+                    Serial.print((uint8_t) responseBuffer[1], HEX);
+                    Serial.print((uint8_t) responseBuffer[2], HEX);
+                    Serial.print((uint8_t) responseBuffer[3], HEX);
+                    Serial.print((uint8_t) responseBuffer[4], HEX);
+                    Serial.print((uint8_t) responseBuffer[5], HEX);
+                    Serial.print((uint8_t) responseBuffer[6], HEX);
+                    Serial.write("\r\n");
             } // else invalid response -- nothing we can do here; ignore and let the controller send the nextCommand
         }
     }

@@ -39,16 +39,25 @@ On the Control Panel side it looks like this:
 
 
 ## Protocol
-Seems like the protocol is using the following structure: <br/>
-``[command byte] [byte1] [byte2] [...] [byteN] [checksum]``
+The control flow is relatively straightforward and it is an endless loop of request (from control panel) and response (from control box) over
+serial line. The serial line operates at 9600 bauds (8bit per frame, 1 stop bit, no parity bit, least significant bit first).
+
+The request always starts with `0xA5` and uses the following structure: <br/>
+``0xA5 [byte1] [byte2] 0x01 [checksum]``
 
 The checksum is calculated as (where `&` is bitwise `AND`): <br/>
-```(byte1 + byte2 + ... + [byteN]) & 0xff```
+```(byte1 + byte2 + 0x01) & 0xff```
 
-### Panel messages:
+The response always starts with `0x5A` and uses the following structure: <br/>
+```0x5A [byte1] [byte2] [byte3] 0x10 [checksum]```
+
+Checksum in this case is ```(byte1 + byte2 + byte3 + 0x10) & 0xff```. The 3 bytes in response are the 3 characters displayed on the control panel and an
+optional decimal point.
+
+### Panel commands (requests):
 Few random observations
 ```
-A5 0 0 1 1    Idle
+A5 0 0 1 1    Idle/Get current display status
 A5 0 20 1 21  Move up
 A5 0 40 1 41  Move down
 A5 0 60 1 61  UP and Down (used to reset)
@@ -61,6 +70,8 @@ A5 0 8 1 9    memory 3
 A5 0 10 1 11  T button
 A5 0 11 1 12  M+T (to get into settings)
 ```
+
+
 ### Board messages
 #### Table height
 Command: `0x5A [byte1] [byte2] [byte3] [byte4] [checksum]` <br/>

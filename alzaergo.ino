@@ -1,39 +1,38 @@
-#include <NeoSWSerial.h>
-#include <Wire.h>
+//#include <NeoSWSerial.h>
+//#include <Wire.h>
 #include <U8g2lib.h>
 
 #include "AlzaET1Ng.h"
 
 
-#define KEY_PIN 30
-const int key_pins[] = {47, 49, 51, 53};
+#define KEY_PIN 5
+const int key_pins[] = {4, 3, 2, 1};
 #define KEY_UP 0
 #define KEY_DOWN 1
 #define KEY_M 2
 
 AlzaET1Ng::ControlPanel AlzaControl(&Serial1, KEY_PIN);
 
-U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+//U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 34, /* dc=*/ 40, /* reset=*/ 39);
+
 
 void setup()
 {
-    Serial.begin(9600);
+    u8g2.begin();
+
+    Serial.begin(115200);
     Serial.write("Hello world");
     for(int x=0; x<4; x++)
     {
       pinMode(key_pins[x], INPUT);
     }
 
-    u8g2.begin();
 
 
     u8g2.clearBuffer();
-
-    u8g2.setFontMode(1);
-    u8g2.setFont(u8g2_font_cu12_tr);
-
-    u8g2.setCursor(0,15);
-    u8g2.print(F("Hello world"));
+    u8g2.setFont(u8g2_font_ncenB08_tr);
+    u8g2.drawStr(15,10,"Hello World!");
     u8g2.sendBuffer();
 
 }
@@ -46,7 +45,7 @@ void writeln(String ln) {
 }
 
 int up, down, memory;
-int last_refresh = 0;
+unsigned long last_refresh = 0;
 char displayData[] = {0, 0, 0, 0};
 
 void loop()
@@ -68,11 +67,18 @@ void loop()
     }
 
 
-    if (millis() - last_refresh > 250) {
+
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_ncenB08_tr);
+    AlzaControl.getBcdDisplayAsString(displayData);
+    u8g2.drawStr(15,10, displayData);
+    u8g2.sendBuffer();
+/*
+    if ((millis() - last_refresh) > 250) {
         //writeln(AlzaControl.getBcdDisplayAsString());
         AlzaControl.getBcdDisplayAsString(displayData);
         Serial.write(displayData);
         Serial.write("\r\n");
         last_refresh = millis();
-    }
+    }*/
 }
