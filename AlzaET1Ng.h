@@ -13,13 +13,13 @@ namespace AlzaET1Ng
 
     static const int COMMAND_SIZE = 5;
     static const int RESPONSE_SIZE = 6;
-    static const int RESPONSE_HEADER  = 0x5a;
-    static const int COMMAND_HEADER = 0xa5;
+    static const int RESPONSE_HEADER  = 0x5A;
+    static const int COMMAND_HEADER = 0xA5;
     enum Commands {
-        Status = 0x0,
+        Status = 0x00,
         Up = 0x20,
         Down = 0x40,
-        M = 0x1,
+        M = 0x01,
         M1 = 0x02,
         M2 = 0x04,
         M3 = 0x08,
@@ -31,7 +31,7 @@ namespace AlzaET1Ng
     {
     private:
         int displayStatus[3] = {0, 0, 0};
-        char displayStatusString[4] = {0, 0, 0, 0};
+        char displayStatusString[5] = {0, 0, 0, 0, 0};
         int height = 0;
 
         HardwareSerial *serial;
@@ -39,6 +39,7 @@ namespace AlzaET1Ng
 
         Commands nextCommand;
         int targetHeight = 0;
+        int oldHeight = 0;
         bool waitForResponse = false;
         unsigned long lastCommandExecution = 0;
         int responseBuffer[RESPONSE_SIZE + 1] = {0, 0, 0, 0, 0, 0, 0};
@@ -46,8 +47,9 @@ namespace AlzaET1Ng
         bool isValidResponse(int response[]);
         void handleIncomingResponse();
         void updateRepresentations();
-        int bcdToMetricHeight();
+        int bcdToHeight();
         void evaluateTargetHeight();
+        void detectStaleHeight();
 
     public:
         // TODO: Add a constructor for NeoSWSerial/SoftwareSerial so this can be used with SW serial too
@@ -58,7 +60,7 @@ namespace AlzaET1Ng
         void holdCommand(Commands cmd);
         void getBcdDisplay(int *data);
         void getBcdDisplayAsString(char *data);
-        int getHeightInMm();
+        int getHeight();
     };
 };
 #endif
