@@ -54,29 +54,38 @@ The response always starts with `0x5A` and uses the following structure: <br/>
 Checksum in this case is ```(byte1 + byte2 + byte3 + 0x10) & 0xff```. The 3 bytes in response are the 3 characters displayed on the control panel and an
 optional decimal point.
 
-### Panel commands (requests):
-Few random observations
+In addition to the serial communication there is also another channel (`Key`) which indicates a pressed button.
+
+Here are two examples of communication between the panel and board
+
+### Status (no action)
+If there is no button pressed the `Key` pin is `LOW`, Control panel sends `0xA5 0x00 0x00 0x01 0x01` ("status") and the Control box replies with what to show on the built-in display (more on that later):
+![Status flow](images/status_flow_annotated.png)
+
+
+Here is another example while pressing the `UP` button on the control panel. In this case the `Key` pin is `HIGH`, control panel sends `0xA5 0x00 0x20 0x01 0x21` and Control box replies with what to show on the built-in display:
+![UP Command](images/up_command_annotated.png)
+
+
+### Control panel commands (requests)
+
+Panel sends one of the following commands:
 ```
-A5 0 0 1 1    Idle/Get current display status
-A5 0 20 1 21  Move up
-A5 0 40 1 41  Move down
-A5 0 60 1 61  UP and Down (used to reset)
-
-
-A5 0 1 1 2    M button
-A5 0 2 1 3    memory 1
-A5 0 4 1 5    memory 2
-A5 0 8 1 9    memory 3
-A5 0 10 1 11  T button
-A5 0 11 1 12  M+T (to get into settings)
+0xA5 0x00 0x00 0x01 0x01    Idle/Get current display status
+0xA5 0x00 0x20 0x01 0x21    Move up
+0xA5 0x00 0x40 0x01 0x41    Move down
+0xA5 0x00 0x60 0x01 0x61    UP and Down (used to reset)
+0xA5 0x00 0x01 0x01 0x02    M button
+0xA5 0x00 0x02 0x01 0x03    memory 1
+0xA5 0x00 0x04 0x01 0x05    memory 2
+0xA5 0x00 0x08 0x01 0x09    memory 3
+0xA5 0x00 0x10 0x01 0x11    T button
+0xA5 0x00 0x11 0x01 0x12    M+T (to get into settings)
 ```
 
 
-### Board messages
-#### Table height
-Command: `0x5A [byte1] [byte2] [byte3] [byte4] [checksum]` <br/>
-
-`byte1`, `byte2`, `byte3` are binary encoded decimals for 7 segment display. Each bit in the byte corresponds to one segment. For example 8 is represented by `0b01111111` (or `0b11111111`; the topmost bit is not relevant):
+### Control Box replies
+The control box reply always follow this structure: `0x5A [byte1] [byte2] [byte3] 0x10 [checksum]` and the three bytes represent three digits/letters on 7 segment [display](https://en.wikipedia.org/wiki/Seven-segment_display). Each bit in the byte corresponds to one segment. For example 8 is represented by `0b01111111` (or `0b11111111`; the topmost bit is not relevant):
 ```
    __0_
   |    |
@@ -88,7 +97,7 @@ Command: `0x5A [byte1] [byte2] [byte3] [byte4] [checksum]` <br/>
      3
 ```
 
-For example 6 can be represented as 0b01111101 (or 0b11111101)
+Digit 6 can be represented as 0b01111101 (or 0b11111101)
 ```
    __0_
   |
@@ -103,7 +112,7 @@ For example 6 can be represented as 0b01111101 (or 0b11111101)
 The top most bit of the middle byte is signaling the decimal point.
 `0x06 0xbf 0x06` translates to `10.1` on display while `0x06 0x3f 0x06` translates to `101` on the display.
 
-The full list of digits:
+Here is a list of digits (the later always represent the digit and a decimal point) but the control box sends more letters than just this one.
 | Digit | Hex                | binary                       |
 |---    | ---                | ---                          |
 | 0     | `0x3f` or `0xbf`   | `0b00111111` or `0b10111111` |
@@ -117,4 +126,7 @@ The full list of digits:
 | 8     | `0x7f` or `0xff`   | `0b01111111` or `0b11111111` |
 | 9     | `0x6f` or `0xef`   | `0b01101111` or `0b11101111` |
 
-The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height `76.5` cm (byte `07` corresponds to `7`, byte `FD` corresponds to `6` and byte `6d` corresponds to `5`).
+The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height `76.5` cm (byte `07` corresponds to `7`, byte `FD` corresponds to `6.` and byte `6d` corresponds to `5`).
+
+### Timing
+The request/reply over serial goes in a very quick succession (around 7ms per command or reply) and it seems like the control board is sensitive on the count of commands. E.g. I was unable to unlock the control panel from sleep (by holding `M` for 3 seconds) if the delay between commands was around `250ms`. Similarly the desk goes up/down slower if the delay between commands is longer (despite the fact the `Key` pin is still `HIGH`).
