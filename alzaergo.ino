@@ -46,7 +46,7 @@ void writeln(String ln) {
 
 int up, down, memory;
 unsigned long last_refresh = 0;
-char displayData[] = {0, 0, 0, 0};
+char displayData[] = {0, 0, 0, 0, 0};
 
 void loop()
 {
@@ -69,10 +69,13 @@ void loop()
 
 
     u8g2.clearBuffer();
-    u8g2.setFont(u8g2_font_ncenB08_tr);
+    u8g2.setFont(u8g2_font_ncenB14_tr);
     AlzaControl.getBcdDisplayAsString(displayData);
-    u8g2.drawStr(15,10, displayData);
+    u8g2.drawStr(35, 40, displayData);
     u8g2.sendBuffer();
+
+
+
 /*
     if ((millis() - last_refresh) > 250) {
         //writeln(AlzaControl.getBcdDisplayAsString());

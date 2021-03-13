@@ -7,7 +7,6 @@ using namespace AlzaET1Ng;
 #endif
 
 
-
 const char AlzaET1Ng::bcdDigitToString(int bcd_code)
 {
   bcd_code = bcd_code & 0x7f; // we don't care about the top-most bit
@@ -52,6 +51,7 @@ const char AlzaET1Ng::bcdDigitToString(int bcd_code)
   return '?';
 }
 
+
 ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
     pinMode(key, OUTPUT);
     digitalWrite(key, LOW);
@@ -62,6 +62,7 @@ ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
     nextCommand = Commands::Status;
 }
 
+
 bool ControlPanel::isValidResponse(int response[]) {
     unsigned int checksum = 0;
     for (int i=2; i < RESPONSE_SIZE; i++) {
@@ -69,6 +70,7 @@ bool ControlPanel::isValidResponse(int response[]) {
     }
     return checksum == response[RESPONSE_SIZE];
 }
+
 
 void ControlPanel::sendCommand(Commands cmd) {
     if (waitForResponse) {
@@ -81,37 +83,45 @@ void ControlPanel::sendCommand(Commands cmd) {
     serial->write((uint8_t) 0x0);
     serial->write((uint8_t) cmd);
     serial->write((uint8_t) 0x01);
-    serial->write((uint8_t) cmd + 1);
+    serial->write((uint8_t) cmd + 1); // this is potentially wrong but all the known commands are smaller than 254 so this will give the rigth result
 
     lastCommandExecution = millis();
-
-    Serial.print((uint8_t) COMMAND_HEADER, HEX);
-    Serial.print((uint8_t) 0x0, HEX);
-    Serial.print((uint8_t) cmd, HEX);
-    Serial.print((uint8_t) 0x01, HEX);
-    Serial.print((uint8_t) cmd + 1, HEX);
-    Serial.write("\r\n");
-
     waitForResponse = true;
 }
 
-int ControlPanel::bcdToMetricHeight() {
-    // height in mm
-    // TODO: this works only with centimeters. If the control board is configured to inches this
-    // will be returning garbage
+
+int ControlPanel::bcdToHeight() {
+    // height is unfortunately unitless depending on the configuration of the control box
+    // (holding T button for 8 seconds switches between inches and cm). This method
+    // just converts whatever is displayed to an integer in the given unit
+
+    // TODO: fix this for inches. If the display shows 72.5, we return 725 from here which is milimeters
+    // when the table operates in inches and the display shows 32.4 we return 324 which is a unit that does
+    // not make much sense
     int new_height = 0;
-    for (int i = 0; i < 3; i++) {
-        if (!(displayStatusString[i] >= '0' && displayStatusString[i] <= '9')) {
+
+    // validate the display; it might show an error or something similar
+    int i = 0;
+    while (displayStatusString[i]) {
+        // if we have some non-digit character it is probably error or some other status message
+        if (!((displayStatusString[i] >= '0' && displayStatusString[i] <= '9') || (displayStatusString[i] == '.'))) {
             return 0;
         }
-        new_height = (displayStatusString[i] - '0') *10 + new_height;
+        i = i + 1;
     }
-    //if the result is e.g. 123, it means we are above one meter and we multiply by 10
-    if (new_height < 200) {
+
+    new_height = (displayStatusString[0] - '0');
+    new_height = new_height * 10 + (displayStatusString[1] - '0');
+    if (displayStatusString[2] == '.') {
+        new_height = new_height * 10 + (displayStatusString[3] - '0');
+    } else {
+        new_height = new_height * 10 + (displayStatusString[2] - '0');
         new_height = new_height * 10;
     }
+
     return new_height;
 }
+
 
 void ControlPanel::updateRepresentations() {
     #ifdef ALZAET1NG_THREADSAFE
@@ -124,11 +134,17 @@ void ControlPanel::updateRepresentations() {
     displayStatus[2] = responseBuffer[4];
 
     // 7 segment display to ASCII
-    displayStatusString[0] = bcdDigitToString(displayStatus[0]);
-    displayStatusString[1] = bcdDigitToString(displayStatus[1]);
-    displayStatusString[2] = bcdDigitToString(displayStatus[2]);
+    int position = 0;
+    displayStatusString[position++] = bcdDigitToString(displayStatus[0]);
+    displayStatusString[position++] = bcdDigitToString(displayStatus[1]);
+    // if the middle digit has top most bit set to 1, it means we have decimal point
+    if ((displayStatus[1] & 0b10000000) == 0b10000000) {
+        displayStatusString[position++] = '.';
+    }
+    displayStatusString[position++] = bcdDigitToString(displayStatus[2]);
+    displayStatusString[position] = 0;
 
-    int new_height = bcdToMetricHeight();
+    int new_height = bcdToHeight();
     if (new_height != 0) {
         height = new_height;
     }
@@ -152,21 +168,20 @@ void ControlPanel::handleIncomingResponse() {
             waitForResponse = false;
             if (isValidResponse(responseBuffer)) {
                 updateRepresentations();
-                    Serial.print((uint8_t) responseBuffer[1], HEX);
-                    Serial.print((uint8_t) responseBuffer[2], HEX);
-                    Serial.print((uint8_t) responseBuffer[3], HEX);
-                    Serial.print((uint8_t) responseBuffer[4], HEX);
-                    Serial.print((uint8_t) responseBuffer[5], HEX);
-                    Serial.print((uint8_t) responseBuffer[6], HEX);
-                    Serial.write("\r\n");
             } // else invalid response -- nothing we can do here; ignore and let the controller send the nextCommand
         }
     }
 }
 
+
+void ControlPanel::detectStaleHeight() {
+
+}
+
 void ControlPanel::handleLoop() {
     sendCommand(nextCommand);
     handleIncomingResponse();
+    detectStaleHeight();
     evaluateTargetHeight();
 
 
@@ -186,6 +201,7 @@ void ControlPanel::holdCommand(Commands cmd) {
     nextCommand = cmd;
 }
 
+
 void ControlPanel::getBcdDisplay(int *data) {
     #ifdef ALZAET1NG_THREADSAFE
     taskENTER_CRITICAL();
@@ -198,6 +214,7 @@ void ControlPanel::getBcdDisplay(int *data) {
     #endif
 }
 
+
 void ControlPanel::getBcdDisplayAsString(char *data) {
     #ifdef ALZAET1NG_THREADSAFE
     taskENTER_CRITICAL();
@@ -205,12 +222,14 @@ void ControlPanel::getBcdDisplayAsString(char *data) {
     data[0] = displayStatusString[0];
     data[1] = displayStatusString[1];
     data[2] = displayStatusString[2];
+    data[3] = displayStatusString[3];
     #ifdef ALZAET1NG_THREADSAFE
     taskEXIT_CRITICAL();
     #endif
 }
 
-int ControlPanel::getHeightInMm() {
+
+int ControlPanel::getHeight() {
     #ifdef ALZAET1NG_THREADSAFE
     taskENTER_CRITICAL();
     #endif
@@ -219,6 +238,7 @@ int ControlPanel::getHeightInMm() {
     taskEXIT_CRITICAL();
     #endif
 }
+
 
 void ControlPanel::evaluateTargetHeight() {
     if (targetHeight != 0) {
@@ -230,6 +250,7 @@ void ControlPanel::evaluateTargetHeight() {
         }
     }
 }
+
 
 void ControlPanel::setHeight(int newHeight) {
     targetHeight = newHeight;
