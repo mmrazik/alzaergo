@@ -139,3 +139,11 @@ The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height 
 
 ### Timing
 The request/reply over serial goes in a very quick succession (around 7ms per command or reply) and it seems like the control board is sensitive on the count of commands. E.g. I was unable to unlock the control panel from sleep (by holding `M` for 3 seconds) if the delay between commands was around `250ms`. Similarly the desk goes up/down slower if the delay between commands is longer (despite the fact the `Key` pin is still `HIGH`).
+
+
+### Standby
+After 60 seconds of inactivity the control board starts sending `0x50 0x40 0x40 0x40 0x10 0xD0` which stands for Safety Standby Mode ("---" on the display). This mode can be also activated by holding down the `M` button for 3 seconds.
+
+After another 9 minutes (10 minutes of inactivity in total) the control board starts sending `0x5A 0x00 0x00 0x00 0x00 0x00` which is a signal to completely shutdown the display of control panel. This can be alternatively the sequence of `0x5A 0x00 0x00 0x00 0x01 0x01` which keeps the timer indicator led on.
+
+After 18 minutes of inactivity the board sends `0x5A 0xFF 0xFF 0xFF 0x00 0xFD` sequence which is a signal to control panel to stop sending the "status" sequence. From this point the traffic on serial line stops until the board is woken up again (by pushing any of the buttons).
