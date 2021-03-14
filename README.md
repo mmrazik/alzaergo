@@ -49,9 +49,9 @@ The checksum is calculated as (where `&` is bitwise `AND`): <br/>
 ```(byte1 + byte2 + 0x01) & 0xff```
 
 The response always starts with `0x5A` and uses the following structure: <br/>
-```0x5A [byte1] [byte2] [byte3] 0x10 [checksum]```
+```0x5A [byte1] [byte2] [byte3] [byte4] [checksum]```
 
-Checksum in this case is ```(byte1 + byte2 + byte3 + 0x10) & 0xff```. The 3 bytes in response are the 3 characters displayed on the control panel and an
+Checksum in this case is ```(byte1 + byte2 + byte3 + byte4]) & 0xff```. The 3 bytes in response are the 3 characters displayed on the control panel and an
 optional decimal point.
 
 In addition to the serial communication there is also another channel (`Key`) which indicates a pressed button.
@@ -85,7 +85,7 @@ Panel sends one of the following commands:
 
 
 ### Control Box replies
-The control box reply always follow this structure: `0x5A [byte1] [byte2] [byte3] 0x10 [checksum]` and the three bytes represent three digits/letters on 7 segment [display](https://en.wikipedia.org/wiki/Seven-segment_display). Each bit in the byte corresponds to one segment. For example 8 is represented by `0b01111111` (or `0b11111111`; the topmost bit is not relevant):
+The control box reply always follow this structure: `0x5A [byte1] [byte2] [byte3] [byte4] [checksum]` and bytes 1 to 3 represent three digits/letters on 7 segment [display](https://en.wikipedia.org/wiki/Seven-segment_display). Each bit in the byte corresponds to one segment. For example 8 is represented by `0b01111111` (or `0b11111111`; the topmost bit is not relevant):
 ```
    __0_
   |    |
@@ -127,6 +127,15 @@ Here is a list of digits (the later always represent the digit and a decimal poi
 | 9     | `0x6f` or `0xef`   | `0b01101111` or `0b11101111` |
 
 The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height `76.5` cm (byte `07` corresponds to `7`, byte `FD` corresponds to `6.` and byte `6d` corresponds to `5`).
+
+Byte 4 can have the following values:
+| Value | Description |
+|---    |---          |
+| 0x00  | Everything on the display is completely off
+| 0x01  | Indicator led (indicates timer) is turned on
+| 0x10  | 7 segment display is on (3 characters + decimal point)
+| 0x11  | 7 segment display is on as well as the timer indicator
+
 
 ### Timing
 The request/reply over serial goes in a very quick succession (around 7ms per command or reply) and it seems like the control board is sensitive on the count of commands. E.g. I was unable to unlock the control panel from sleep (by holding `M` for 3 seconds) if the delay between commands was around `250ms`. Similarly the desk goes up/down slower if the delay between commands is longer (despite the fact the `Key` pin is still `HIGH`).
