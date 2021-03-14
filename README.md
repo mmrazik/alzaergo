@@ -128,13 +128,13 @@ Here is a list of digits (the later always represent the digit and a decimal poi
 
 The byte sequence of `5A 07 FD 6D 10 81 ` therefore corresponds to table height `76.5` cm (byte `07` corresponds to `7`, byte `FD` corresponds to `6.` and byte `6d` corresponds to `5`).
 
-Byte 4 can have the following values:
+`Byte4` can have the following values:
 | Value | Description |
 |---    |---          |
-| 0x00  | Everything on the display is completely off
-| 0x01  | Indicator led (indicates timer) is turned on
-| 0x10  | 7 segment display is on (3 characters + decimal point)
-| 0x11  | 7 segment display is on as well as the timer indicator
+| `0x00`  | Everything on the display is completely off
+| `0x01`  | Timer indicator is turned on
+| `0x10`  | 7 segment display is on (3 characters + decimal point)
+| `0x11`  | 7 segment display is on as well as the timer indicator
 
 
 ### Timing
