@@ -7,21 +7,20 @@ The work is in progress.
 ### Control Panel
 Controls height of the desk, show the current height on display, has memory for 3 positions, you can set min/max height, etc.
 
-![Control Panel](images/control_panel.png)
+<img src="images/control_panel.png" width="400" />
 
 ### Control Box
 Contains the PowerSupply Unit, controls the motors and, gets commands from the Control Panel.
 
-![Control Box](images/control_box.png)
+<img src="images/control_box.png" width="400" />
 
 ### Connection
 The control box has a RJ-45 port. It seems like all 8 pins are being used but the provided Control Panel is only using 5 of them and does not wire the rest at all.
 
-![Control Box](images/control_box_pins.png)
-
+<img src="images/control_box_pins.png" width="400" />
 
 The wiring of the RJ45 port is as follows:
-<img align="right" src="images/rj45.png">
+<img align="right" src="images/rj45.png" width="200">
 1. D-TX (green wire)
 2. D-RX (brown wire; control panel transmits here)
 3. unused
@@ -34,9 +33,8 @@ The wiring of the RJ45 port is as follows:
 <br style="clear:both" />
 
 
-On the Control Panel side it looks like this:
-![Control Box](images/control_panel_pinout.png)
-
+Control Panel from the back: <br/>
+<img src="images/control_panel_pinout.png" width="400" />
 
 ## Protocol
 The control flow is relatively straightforward and it is an endless loop of request (from control panel) and response (from control box) over
