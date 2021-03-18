@@ -43,7 +43,7 @@ jobs:
       - name: Checkout ArduinoUnit
         uses: actions/checkout@master
         with:
-          name: mmurdoch/arduinounit
+          repository: mmurdoch/arduinounit
 
       - name: Install test dependencies
         run: |
