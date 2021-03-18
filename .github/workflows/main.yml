@@ -1,0 +1,41 @@
+# This is the name of the workflow, visible on GitHub UI.
+name: Main build
+
+on: [push, pull_request]
+
+# This is the list of jobs that will be run concurrently.
+# Since we use a build matrix, the actual number of jobs
+# started depends on how many configurations the matrix
+# will produce.
+jobs:
+  build-job:
+    strategy:
+      matrix:
+        arduino-board-fqbn:
+          - esp32:esp32:lolin32
+        include:
+          - arduino-boards-fqbn: esp32:esp32:lolin32
+            platform-url: https://dl.espressif.com/dl/package_esp32_index.json
+            arduino-platform: "esp32:esp32"
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1.1.1
+
+      # We then install the platform, which one will be determined
+      # dynamically by the build matrix.
+      - name: Install platform
+        run: |
+          arduino-cli core --additional-urls ${{ matrix.platform-url }} update-index
+          arduino-cli core --additional-urls ${{ matrix.platform-url }} install ${{ matrix.arduino-platform }}
+          arduino-cli lib install u8g2
+
+      # Finally, we compile the sketch, using the FQBN that was set
+      # in the build matrix.
+      - name: Compile Sketch
+        run: arduino-cli compile --log-level info --fqbn ${{ matrix.arduino-board-fqbn }} ./alzaergo

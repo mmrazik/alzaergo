@@ -16,7 +16,8 @@
                 "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
                 "C:\\Program Files (x86)\\Arduino\\libraries\\**",
                 "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\libraries\\**",
-                "C:\\Program Files (x86)\\Arduino\\tools\\**"
+                "C:\\Program Files (x86)\\Arduino\\tools\\**",
+                "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\hardware\\espressif\\esp32\\**"
             ],
             "forcedInclude": [
                 "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h",
