@@ -18,7 +18,7 @@ jobs:
             platform-url: https://dl.espressif.com/dl/package_esp32_index.json
             arduino-platform: "esp32:esp32"
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
