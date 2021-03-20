@@ -2,11 +2,6 @@
 #include "Arduino.h"
 using namespace AlzaET1Ng;
 
-#ifdef ALZAET1NG_THREADSAFE
-    #include "task.h"
-#endif
-
-
 const char AlzaET1Ng::bcdDigitToString(int bcd_code)
 {
   bcd_code = bcd_code & 0x7f; // we don't care about the top-most bit
@@ -56,6 +51,13 @@ ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
     pinMode(key, OUTPUT);
     digitalWrite(key, LOW);
     keyPin = key;
+    #ifdef ALZAET1NG_THREADSAFE
+        mutex = xSemaphoreCreateMutex();
+        if (mutex == NULL) {
+        // do something here
+    }
+    #endif
+
 
     serial = hws;
     //serial->begin(9600);
@@ -126,7 +128,7 @@ int ControlPanel::bcdToHeight() {
 
 void ControlPanel::updateRepresentations() {
     #ifdef ALZAET1NG_THREADSAFE
-    taskENTER_CRITICAL();
+    xSemaphoreTake(mutex, portMAX_DELAY);
     #endif
 
     // raw (7 segment display)
@@ -150,7 +152,7 @@ void ControlPanel::updateRepresentations() {
         height = new_height;
     }
     #ifdef ALZAET1NG_THREADSAFE
-    taskEXIT_CRITICAL();
+    xSemaphoreGive(mutex);
     #endif
 }
 
@@ -169,6 +171,17 @@ void ControlPanel::handleIncomingResponse() {
             waitForResponse = false;
             if (isValidResponse(responseBuffer)) {
                 updateRepresentations();
+                #ifdef ALZAET1NG_THREADSAFE
+                // This is just an assumption that when we are running in the THREADSAFE mode
+                // we run on a dedicated core/task. In that case we need to call delay every now and then
+                // otherwise the watchdog timer will be triggered and will kill the task
+
+                // TODO: try to figure out if there is a way to just feed the watchdog and not do a 1ms delay
+                // ~0.5ms delay might be sill desirable so we do not send next command immediately after the receive.
+                // The originial control panel seem to be sending a command every ~7ms (which is approcimately
+                // 1 command transmittion time + something on top)
+                delay(1);
+                #endif
             } // else invalid response -- nothing we can do here; ignore and let the controller send the nextCommand
         }
     }
@@ -180,6 +193,13 @@ void ControlPanel::detectStaleHeight() {
 }
 
 void ControlPanel::handleLoop() {
+    #ifdef DEBUG
+    if ((millis() - lastUpdate) > 50) {
+        lastUpdate = millis();
+        Serial.write(String(lastUpdate).c_str());
+        Serial.write("\r\n");
+    }
+    #endif
     sendCommand(nextCommand);
     handleIncomingResponse();
     detectStaleHeight();
@@ -205,38 +225,38 @@ void ControlPanel::holdCommand(Commands cmd) {
 
 void ControlPanel::getBcdDisplay(int *data) {
     #ifdef ALZAET1NG_THREADSAFE
-    taskENTER_CRITICAL();
+    xSemaphoreTake(mutex, portMAX_DELAY);
     #endif
     data[0] = displayStatus[0];
     data[1] = displayStatus[1];
     data[2] = displayStatus[2];
     #ifdef ALZAET1NG_THREADSAFE
-    taskEXIT_CRITICAL();
+    xSemaphoreGive(mutex);
     #endif
 }
 
 
 void ControlPanel::getBcdDisplayAsString(char *data) {
     #ifdef ALZAET1NG_THREADSAFE
-    taskENTER_CRITICAL();
+    xSemaphoreTake(mutex, portMAX_DELAY);
     #endif
     data[0] = displayStatusString[0];
     data[1] = displayStatusString[1];
     data[2] = displayStatusString[2];
     data[3] = displayStatusString[3];
     #ifdef ALZAET1NG_THREADSAFE
-    taskEXIT_CRITICAL();
+    xSemaphoreGive(mutex);
     #endif
 }
 
 
 int ControlPanel::getHeight() {
     #ifdef ALZAET1NG_THREADSAFE
-    taskENTER_CRITICAL();
+    xSemaphoreTake(mutex, portMAX_DELAY);
     #endif
     return height;
     #ifdef ALZAET1NG_THREADSAFE
-    taskEXIT_CRITICAL();
+    xSemaphoreGive(mutex);
     #endif
 }
 

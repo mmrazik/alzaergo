@@ -3,6 +3,7 @@
 #include "Arduino.h"
 
 #ifdef ALZAET1NG_THREADSAFE
+  #include "freertos/semphr.h"
 #endif
 
 
@@ -33,6 +34,9 @@ namespace AlzaET1Ng
         int displayStatus[3] = {0, 0, 0};
         char displayStatusString[5] = {0, 0, 0, 0, 0};
         int height = 0;
+        #ifdef ALZAET1NG_THREADSAFE
+        SemaphoreHandle_t mutex;
+        #endif
 
         HardwareSerial *serial;
         int keyPin;
@@ -43,6 +47,10 @@ namespace AlzaET1Ng
         bool waitForResponse = false;
         unsigned long lastCommandExecution = 0;
         int responseBuffer[RESPONSE_SIZE + 1] = {0, 0, 0, 0, 0, 0, 0};
+
+        #ifdef DEBUG
+        unsigned long lastUpdated = 0;
+        #endif
 
         bool isValidResponse(int response[]);
         void handleIncomingResponse();
