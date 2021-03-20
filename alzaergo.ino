@@ -2,7 +2,7 @@
 //#include <Wire.h>
 #include <U8g2lib.h>
 #define ALZAET1NG_THREADSAFE
-#include "AlzaET1Ng.h"
+#include "src/AlzaET1Ng.h"
 
 
 #define KEY_PIN 22

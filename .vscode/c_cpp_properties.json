@@ -12,16 +12,9 @@
                 "/home/mmrazik/arduino-1.8.12/hardware/tools/**",
                 "/home/mmrazik/arduino-1.8.12/libraries/**",
                 "/home/mmrazik/arduino-1.8.12/tools/**",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\**",
-                "C:\\Program Files (x86)\\Arduino\\libraries\\**",
-                "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\libraries\\**",
-                "C:\\Program Files (x86)\\Arduino\\tools\\**",
-                "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\hardware\\espressif\\esp32\\**"
             ],
             "forcedInclude": [
                 "/home/mmrazik/arduino-1.8.12/hardware/arduino/avr/cores/arduino/Arduino.h",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ],
             "defines": [
                 "USBCON"
@@ -34,6 +27,7 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}\\src\\**",
                 "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\hardware\\espressif\\esp32\\**",
                 "C:\\Program Files (x86)\\Arduino\\tools\\**",
                 "C:\\Users\\martinmrazik\\OneDrive - Microsoft\\Documents\\Arduino\\libraries\\**",
