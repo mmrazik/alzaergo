@@ -18,7 +18,7 @@ jobs:
             platform-url: https://dl.espressif.com/dl/package_esp32_index.json
             arduino-platform: "esp32:esp32"
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -34,8 +34,22 @@ jobs:
           arduino-cli core --additional-urls ${{ matrix.platform-url }} update-index
           arduino-cli core --additional-urls ${{ matrix.platform-url }} install ${{ matrix.arduino-platform }}
           arduino-cli lib install u8g2
+      # apt-get install make g++
 
       # Finally, we compile the sketch, using the FQBN that was set
       # in the build matrix.
       - name: Compile Sketch
         run: arduino-cli compile --log-level info --fqbn ${{ matrix.arduino-board-fqbn }} ./alzaergo
+
+      - name: Install test dependencies
+        run: |
+          sudo apt-get install make g++
+          cd ..
+          git clone https://github.com/bxparks/EpoxyDuino
+          git clone https://github.com/bxparks/AUnit
+
+      - name: Build tests
+        run: make -C tests
+
+      - name: Run tests
+        run: tests/AlzaEt1NgTests.out
