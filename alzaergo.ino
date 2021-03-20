@@ -5,21 +5,22 @@
 #include "AlzaET1Ng.h"
 
 
-#define KEY_PIN 5
-const int key_pins[] = {4, 3, 2, 1};
+#define KEY_PIN 22
+const int key_pins[] = {27, 14, 12, 13};
 #define KEY_UP 0
 #define KEY_DOWN 1
 #define KEY_M 2
 
-AlzaET1Ng::ControlPanel AlzaControl(&Serial1, KEY_PIN);
+AlzaET1Ng::ControlPanel AlzaControl(&Serial2, KEY_PIN);
 
 //U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
-U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 34, /* dc=*/ 40, /* reset=*/ 39);
+U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 5, /* dc=*/ 32, /* reset=*/ 33);
 
 
 void setup()
 {
     u8g2.begin();
+
 
     Serial.begin(115200);
     Serial.write("Hello world");
@@ -72,6 +73,7 @@ void loop()
     u8g2.setFont(u8g2_font_ncenB14_tr);
     AlzaControl.getBcdDisplayAsString(displayData);
     u8g2.drawStr(35, 40, displayData);
+    //u8g2.drawStr(35, 40, String(millis()).c_str());
     u8g2.sendBuffer();
 
 
