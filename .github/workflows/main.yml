@@ -43,13 +43,14 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          sudo apt-get install make g++
-          cd ..
-          git clone https://github.com/bxparks/EpoxyDuino
-          git clone https://github.com/bxparks/AUnit
+          sudo apt-get install make g++ cmake
 
       - name: Build tests
-        run: make -C tests
+        run: |
+          mkdir build && cd build
+          cmake ../tests
+          make
+          cd ..
 
       - name: Run tests
-        run: tests/AlzaEt1NgTests.out
+        run: build/test-all
