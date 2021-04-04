@@ -38,7 +38,7 @@ namespace AlzaET1Ng
         SemaphoreHandle_t mutex;
         #endif
 
-        HardwareSerial *serial;
+        HardwareSerial &serial;
         int keyPin;
 
         Commands nextCommand;
@@ -61,7 +61,7 @@ namespace AlzaET1Ng
 
     public:
         // TODO: Add a constructor for NeoSWSerial/SoftwareSerial so this can be used with SW serial too
-        ControlPanel(HardwareSerial *srl, int key);
+        ControlPanel(HardwareSerial &srl, int key);
         void sendCommand(Commands cmd);
         void setHeight(int newHeight);
         void handleLoop();
@@ -69,6 +69,9 @@ namespace AlzaET1Ng
         void getBcdDisplay(int *data);
         void getBcdDisplayAsString(char *data);
         int getHeight();
+
+        // mostly for testing
+        Commands getNextCommand();
     };
 };
 #endif
