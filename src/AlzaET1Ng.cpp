@@ -47,7 +47,8 @@ const char AlzaET1Ng::bcdDigitToString(int bcd_code)
 }
 
 
-ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
+ControlPanel::ControlPanel(HardwareSerial &hws, int key):
+  serial(hws) {
     pinMode(key, OUTPUT);
     digitalWrite(key, LOW);
     keyPin = key;
@@ -58,10 +59,8 @@ ControlPanel::ControlPanel(HardwareSerial *hws, int key) {
     }
     #endif
 
-
-    serial = hws;
-    //serial->begin(9600);
-    serial->begin(9600, SERIAL_8N1, 16, 17);
+    //serial.begin(9600);
+    serial.begin(9600, SERIAL_8N1, 16, 17);
     nextCommand = Commands::Status;
 }
 
@@ -82,11 +81,11 @@ void ControlPanel::sendCommand(Commands cmd) {
     // Command is 5 bytes:
     // [command_header] 0x0 [command] 0x01 [checksum]
     // e.g. 0xa5, 0x00, 0x20, 0x01, 0x21
-    serial->write((uint8_t) COMMAND_HEADER);
-    serial->write((uint8_t) 0x0);
-    serial->write((uint8_t) cmd);
-    serial->write((uint8_t) 0x01);
-    serial->write((uint8_t) cmd + 1); // this is potentially wrong but all the known commands are smaller than 254 so this will give the rigth result
+    serial.write((uint8_t) COMMAND_HEADER);
+    serial.write((uint8_t) 0x0);
+    serial.write((uint8_t) cmd);
+    serial.write((uint8_t) 0x01);
+    serial.write((uint8_t) cmd + 1); // this is potentially wrong but all the known commands are smaller than 254 so this will give the rigth result
 
     lastCommandExecution = millis();
     waitForResponse = true;
@@ -157,8 +156,8 @@ void ControlPanel::updateRepresentations() {
 }
 
 void ControlPanel::handleIncomingResponse() {
-    if (serial->available()) {
-        int c = serial->read();
+    if (serial.available()) {
+        int c = serial.read();
         if (c == RESPONSE_HEADER) {
             responseBuffer[0] = 1;
             responseBuffer[1] = c;
@@ -281,4 +280,8 @@ void ControlPanel::setHeight(int newHeight) {
     if (newHeight < height) {
         holdCommand(Commands::Down);
     }
+}
+
+Commands ControlPanel::getNextCommand() {
+    return nextCommand;
 }

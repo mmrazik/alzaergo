@@ -12,7 +12,7 @@ const int key_pins[] = {27, 14, 12, 13};
 #define KEY_M 2
 
 TaskHandle_t AlzaTask;
-AlzaET1Ng::ControlPanel AlzaControl(&Serial2, KEY_PIN);
+AlzaET1Ng::ControlPanel AlzaControl(Serial2, KEY_PIN);
 
 //U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 5, /* dc=*/ 32, /* reset=*/ 33);
