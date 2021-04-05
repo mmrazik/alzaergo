@@ -43,7 +43,7 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          sudo apt-get install make g++ cmake
+          sudo apt-get install make g++ cmake lcov
 
       - name: Build tests
         run: |
@@ -54,3 +54,15 @@ jobs:
 
       - name: Run tests
         run: build/test-all
+
+      - name: Collect Coverage Data
+        run: |
+          cd build
+          lcov --capture --directory . --include '*AlzaET1Ng.cpp' --output-file coverage.info
+          genhtml coverage.info --output-directory coverage_data
+
+      - name: Archive coverage data
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: build/coverage_data
