@@ -40,26 +40,18 @@ httpd_uri_t uri_get_height = {
 
 httpd_handle_t startWebServer(void)
 {
-    /* Generate default configuration */
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-
-    /* Empty handle to esp_http_server */
     httpd_handle_t server = NULL;
 
-    /* Start the httpd server */
     if (httpd_start(&server, &config) == ESP_OK) {
-        /* Register URI handlers */
         httpd_register_uri_handler(server, &uri_get_height);
-
     }
-    /* If server failed to start, handle will be NULL */
     return server;
 }
 
 void stop_webserver(httpd_handle_t server)
 {
     if (server) {
-        /* Stop the httpd server */
         httpd_stop(server);
     }
 }
