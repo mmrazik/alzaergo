@@ -59,10 +59,10 @@ jobs:
         run: |
           cd build
           lcov --capture --directory . --include '*AlzaET1Ng.cpp' --output-file coverage.info
-          genhtml coverage.info --output-directory out
+          genhtml coverage.info --output-directory coverage_data
 
       - name: Archive coverage data
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage-report
-          path: build/out/src/AlzaET1Ng.cpp.gcov.html
+          path: build/coverage_data
