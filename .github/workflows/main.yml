@@ -40,7 +40,7 @@ jobs:
       # in the build matrix.
       - name: Compile Sketch
         run: |
-          cp WiFiConfig.h.sample WiFiConfig.h
+          cp alzaergo/WiFiConfig.h.sample alzaergo/WiFiConfig.h
           arduino-cli compile --log-level info --fqbn ${{ matrix.arduino-board-fqbn }} ./alzaergo
 
       - name: Install test dependencies
