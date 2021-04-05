@@ -130,6 +130,25 @@ TEST_F(TestFixtureWithSerialData, handleIncomingResponseWithWrongChecksum) {
     ASSERT_EQ(data[2], 0x0);
 }
 
+
+TEST_F(TestFixtureWithSerialData, testSettingsString) {
+    AlzaET1Ng::ControlPanel AlzaControl(Serial, KEY_PIN);
+    // Corresponds to 76.5
+    int message[] = {AlzaET1Ng::RESPONSE_HEADER, 0x6d, 0x40, 0x5b,  0x10, 0x18};
+    SetSerialMessage(message, AlzaET1Ng::RESPONSE_SIZE);
+    for (int i=0; i < AlzaET1Ng::RESPONSE_SIZE; i++) {
+        AlzaControl.handleIncomingResponse();
+    }
+
+    ASSERT_EQ(AlzaControl.getHeight(), 0);
+
+    char str_data[4];
+    AlzaControl.getBcdDisplayAsString(str_data);
+    ASSERT_EQ(str_data[0], 'S');
+    ASSERT_EQ(str_data[1], '-');
+    ASSERT_EQ(str_data[2], '2');
+}
+
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

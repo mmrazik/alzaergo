@@ -139,6 +139,14 @@ void ControlPanel::updateRepresentations() {
     int position = 0;
     displayStatusString[position++] = bcdDigitToString(displayStatus[0]);
     displayStatusString[position++] = bcdDigitToString(displayStatus[1]);
+
+    // If the middle character is '-' and the first one is '5', we are in the settings
+    // The 7 segment display shows '5' and 'S' as the same character but they are not
+    // the same. Be a bit smarter here and change the '5' to 'S'
+    if ((displayStatusString[1] == '-') && (displayStatusString[0] == '5')) {
+        displayStatusString[0] = 'S';
+    }
+
     // if the middle digit has top most bit set to 1, it means we have decimal point
     if ((displayStatus[1] & 0b10000000) == 0b10000000) {
         displayStatusString[position++] = '.';
