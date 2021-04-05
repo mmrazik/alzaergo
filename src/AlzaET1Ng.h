@@ -16,6 +16,7 @@ namespace AlzaET1Ng
     static const int RESPONSE_SIZE = 6;
     static const int RESPONSE_HEADER  = 0x5A;
     static const int COMMAND_HEADER = 0xA5;
+    static const unsigned long WAIT_FOR_RESPONSE_TIMEOUT = 200;
     enum Commands {
         Status = 0x00,
         Up = 0x20,
@@ -53,7 +54,6 @@ namespace AlzaET1Ng
         #endif
 
         bool isValidResponse(int response[]);
-        void handleIncomingResponse();
         void updateRepresentations();
         int bcdToHeight();
         void evaluateTargetHeight();
@@ -70,8 +70,12 @@ namespace AlzaET1Ng
         void getBcdDisplayAsString(char *data);
         int getHeight();
 
+        // public to make testing easier
+        void handleIncomingResponse();
+
         // mostly for testing
         Commands getNextCommand();
+        bool waitingForResponse();
     };
 };
 #endif

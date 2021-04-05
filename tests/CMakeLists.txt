@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.8)
 project(alzaergo-et-ng-tests)
 find_package(Threads REQUIRED)
 
+SET(CMAKE_CXX_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage")
+
 add_subdirectory(arduino_mock)
 
 include_directories(

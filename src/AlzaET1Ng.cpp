@@ -206,7 +206,7 @@ void ControlPanel::handleLoop() {
 
 
     // if we are in some weird state, still waiting for a response but nothing comes in, stop waiting for response
-    if ((millis() - lastCommandExecution) >  200) {
+    if ((millis() - lastCommandExecution) >  WAIT_FOR_RESPONSE_TIMEOUT) {
       waitForResponse = false;
     }
 }
@@ -284,4 +284,8 @@ void ControlPanel::setHeight(int newHeight) {
 
 Commands ControlPanel::getNextCommand() {
     return nextCommand;
+}
+
+bool ControlPanel::waitingForResponse() {
+    return waitForResponse;
 }
