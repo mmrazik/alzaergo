@@ -39,7 +39,9 @@ jobs:
       # Finally, we compile the sketch, using the FQBN that was set
       # in the build matrix.
       - name: Compile Sketch
-        run: arduino-cli compile --log-level info --fqbn ${{ matrix.arduino-board-fqbn }} ./alzaergo
+        run: |
+          cp WiFiConfig.h.sample WiFiConfig.h
+          arduino-cli compile --log-level info --fqbn ${{ matrix.arduino-board-fqbn }} ./alzaergo
 
       - name: Install test dependencies
         run: |
