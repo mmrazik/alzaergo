@@ -3,6 +3,12 @@
 #include <U8g2lib.h>
 #define ALZAET1NG_THREADSAFE
 #include "src/AlzaET1Ng.h"
+#include <WiFi.h>
+#include "WiFiConfig.h"
+#include "esp_http_server.h"
+
+
+
 
 
 #define KEY_PIN 22
@@ -13,15 +19,77 @@ const int key_pins[] = {27, 14, 12, 13};
 
 TaskHandle_t AlzaTask;
 AlzaET1Ng::ControlPanel AlzaControl(Serial2, KEY_PIN);
+httpd_handle_t httpServer;
 
 //U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 5, /* dc=*/ 32, /* reset=*/ 33);
 
+esp_err_t get_height_handler(httpd_req_t *req)
+{
+    httpd_resp_send(req, String(AlzaControl.getHeight()).c_str(), HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+httpd_uri_t uri_get_height = {
+    .uri      = "/height",
+    .method   = HTTP_GET,
+    .handler  = get_height_handler,
+    .user_ctx = NULL
+};
+
+
+httpd_handle_t startWebServer(void)
+{
+    /* Generate default configuration */
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+    /* Empty handle to esp_http_server */
+    httpd_handle_t server = NULL;
+
+    /* Start the httpd server */
+    if (httpd_start(&server, &config) == ESP_OK) {
+        /* Register URI handlers */
+        httpd_register_uri_handler(server, &uri_get_height);
+
+    }
+    /* If server failed to start, handle will be NULL */
+    return server;
+}
+
+void stop_webserver(httpd_handle_t server)
+{
+    if (server) {
+        /* Stop the httpd server */
+        httpd_stop(server);
+    }
+}
 
 void AlzaMainLoop( void * parameter) {
   for(;;) {
     AlzaControl.handleLoop();
   }
+}
+
+void ConnectToWiFi()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to "); Serial.println(ssid);
+
+  uint8_t i = 0;
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print('.');
+    delay(500);
+
+    if ((++i % 16) == 0)
+    {
+      Serial.println(F(" still trying to connect"));
+    }
+  }
+
+  Serial.print(F("Connected. My IP address is: "));
+  Serial.println(WiFi.localIP());
 }
 
 void setup()
@@ -49,6 +117,9 @@ void setup()
       0,      /* Priority of the task */
       &AlzaTask,
       0); /* Core where the task should run */
+
+    ConnectToWiFi();
+    httpServer = startWebServer();
 
 }
 
@@ -86,6 +157,7 @@ void loop()
     u8g2.setFont(u8g2_font_ncenB14_tr);
     AlzaControl.getBcdDisplayAsString(displayData);
     u8g2.drawStr(35, 40, displayData);
+    u8g2.setFont(u8g2_font_helvR08_te);
+    u8g2.drawStr(10, 10, WiFi.localIP().toString().c_str());
     u8g2.sendBuffer();
-
 }
