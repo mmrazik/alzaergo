@@ -30,6 +30,14 @@ esp_err_t get_height_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t set_height_handler(httpd_req_t *req)
+{
+    int newHeight = String(req->uri).substring(strlen("/set/height/")).toInt();
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+
 httpd_uri_t uri_get_height = {
     .uri      = "/height",
     .method   = HTTP_GET,
@@ -37,6 +45,12 @@ httpd_uri_t uri_get_height = {
     .user_ctx = NULL
 };
 
+httpd_uri_t uri_set_height = {
+    .uri      = "/set/height",
+    .method   = HTTP_GET,
+    .handler  = set_height_handler,
+    .user_ctx = NULL
+};
 
 httpd_handle_t startWebServer(void)
 {
@@ -110,8 +124,8 @@ void setup()
       &AlzaTask,
       0); /* Core where the task should run */
 
-    ConnectToWiFi();
-    httpServer = startWebServer();
+    //ConnectToWiFi();
+    //httpServer = startWebServer();
 
 }
 
@@ -137,10 +151,13 @@ void loop()
 
     if (up == HIGH) {
         AlzaControl.holdCommand(AlzaET1Ng::Commands::Up);
+        Serial.println("Command: Up");
     } else if (down == HIGH) {
         AlzaControl.holdCommand(AlzaET1Ng::Commands::Down);
+        Serial.println("Command: Down");
     } else if (memory == HIGH) {
         AlzaControl.holdCommand(AlzaET1Ng::Commands::M);
+        Serial.println("Command: M");
     } else {
         AlzaControl.holdCommand(AlzaET1Ng::Commands::Status);
     }
@@ -149,7 +166,8 @@ void loop()
     u8g2.setFont(u8g2_font_ncenB14_tr);
     AlzaControl.getBcdDisplayAsString(displayData);
     u8g2.drawStr(35, 40, displayData);
-    u8g2.setFont(u8g2_font_helvR08_te);
-    u8g2.drawStr(10, 10, WiFi.localIP().toString().c_str());
+    Serial.println(displayData);
+    /*u8g2.setFont(u8g2_font_helvR08_te);
+    u8g2.drawStr(10, 10, WiFi.localIP().toString().c_str());*/
     u8g2.sendBuffer();
 }

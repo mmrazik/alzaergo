@@ -1,3 +1,4 @@
+#define ALZAET1NG_THREADSAFE
 #include "AlzaET1Ng.h"
 #include "Arduino.h"
 using namespace AlzaET1Ng;
